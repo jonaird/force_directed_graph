@@ -1,6 +1,6 @@
 name: force_directed_graph
 description: A package for creating force directed graphs.
-version: 0.0.4
+version: 0.0.5
 homepage: "https://github.com/jonaird/force_directed_graph"
 
 environment:
@@ -8,8 +8,8 @@ environment:
   flutter: ">=1.17.0 <2.0.0"
 
 dependencies:
-  vector_math: ^2.1.0
-  collection: ^1.15.0
+  vector_math: 
+  collection: 
   tuple: ^1.0.3
   flutter:
     sdk: flutter
