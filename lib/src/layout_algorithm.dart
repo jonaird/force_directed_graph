@@ -1,35 +1,25 @@
 part of '../force_directed_graph.dart';
 
-abstract class NodeLayoutAlgorithm {
-  const NodeLayoutAlgorithm();
-
-  Map<T, Offset> runAlgorithm<T>(
-      Map<T, NodeOffset> nodes, List<Edge<T>> edges, Size size);
+abstract class GraphLayoutAlgorithm {
+  Map<T, Offset> runAlgorithm<T>(Map<T, NodeOffset?> nodes, List<Edge<T>> edges, Size size);
 }
 
 var r = Random();
 
-class FruchtermanReingoldAlgorithm extends NodeLayoutAlgorithm {
-  const FruchtermanReingoldAlgorithm(
-      {this.iterations = 1000,
-      this.repulsionMultiplierX = 1,
-      this.repulsionMultiplierY = 1,
-      this.attractionMultiplier = 1});
+class FruchtermanReingoldAlgorithm implements GraphLayoutAlgorithm {
+  const FruchtermanReingoldAlgorithm({this.iterations = 1000});
   final int iterations;
-  final double repulsionMultiplierX, repulsionMultiplierY, attractionMultiplier;
 
   MapEntry<T, MutableNodePosition> _offsetToMutablePostion<T>(
-      T key, NodeOffset value, Size size) {
+      T key, NodeOffset? value, Size size) {
     if (value == null)
       return MapEntry(key, _randomPosition(size));
     else
-      return MapEntry(
-          key, MutableNodePosition(value.toVector(size), pinned: value.pinned));
+      return MapEntry(key, MutableNodePosition(value.toVector(size), pinned: value.pinned));
   }
 
   @override
-  Map<T, Offset> runAlgorithm<T>(
-      Map<T, NodeOffset> nodes, List<Edge<T>> edges, Size size) {
+  Map<T, Offset> runAlgorithm<T>(Map<T, NodeOffset?> nodes, List<Edge<T>> edges, Size size) {
     var temp = 0.1 * sqrt(size.width / 2 * size.height / 2);
 
     //initialize nodes with random positions and convert to MutableNodePosition
@@ -45,16 +35,15 @@ class FruchtermanReingoldAlgorithm extends NodeLayoutAlgorithm {
         .map((key, value) => MapEntry(key, value.position.toOffset(size)));
   }
 
-  void _calculateIteration<T>(Map<T, MutableNodePosition> nodes,
-      List<Edge<T>> edges, Size size, double t) {
+  void _calculateIteration<T>(
+      Map<T, MutableNodePosition> nodes, List<Edge<T>> edges, Size size, double t) {
     var width = size.width;
     var height = size.height;
     final result = nodes;
 
-    //initialize new nodes with random positions
-    result.forEach((key, value) => value.position ??= Vector2(
-        (r.nextDouble() - 0.5) * width / 2,
-        (r.nextDouble() - 0.5) * height / 2));
+    // //initialize new nodes with random positions
+    // result.forEach((key, value) => value.position ??=
+    //     Vector2((r.nextDouble() - 0.5) * width / 2, (r.nextDouble() - 0.5) * height / 2));
 
     final area = width * height;
     final k = sqrt(area / nodes.keys.length);
@@ -70,8 +59,7 @@ class FruchtermanReingoldAlgorithm extends NodeLayoutAlgorithm {
           if (delta.length == 0) delta = Vector2(0.01, 0.01);
           if (delta.x == 0) delta.x = 0.01;
           if (delta.y == 0) delta.y = 0.01;
-          delta = Vector2(
-              delta.x / repulsionMultiplierX, delta.y / repulsionMultiplierY);
+          delta = Vector2(delta.x, delta.y);
           v.displacement += delta / delta.length * repulsionForce(delta.length);
         }
       }
@@ -80,21 +68,13 @@ class FruchtermanReingoldAlgorithm extends NodeLayoutAlgorithm {
     //calculate attractive forces
 
     for (var edge in edges) {
-      var v = result[edge.source];
-      var u = result[edge.destination];
+      var v = result[edge.source]!;
+      var u = result[edge.destination]!;
 
       var delta = v.position - u.position;
       if (delta.length == 0) delta = Vector2(0.01, 0.01);
-      if (!v.pinned)
-        v.displacement -= delta /
-            delta.length *
-            attractionForce(delta.length) *
-            attractionMultiplier;
-      if (!u.pinned)
-        u.displacement += delta /
-            delta.length *
-            attractionForce(delta.length) *
-            attractionMultiplier;
+      if (!v.pinned) v.displacement -= delta / delta.length * attractionForce(delta.length);
+      if (!u.pinned) u.displacement += delta / delta.length * attractionForce(delta.length);
     }
 
     //limit max displacement to temperature t and prevent from displacement
@@ -102,8 +82,7 @@ class FruchtermanReingoldAlgorithm extends NodeLayoutAlgorithm {
     for (var v in result.values) {
       if (!v.pinned) {
         if (v.displacement.length == 0) v.displacement = Vector2(0.01, 0.01);
-        v.position += (v.displacement / v.displacement.length) *
-            min(v.displacement.length, t);
+        v.position += (v.displacement / v.displacement.length) * min(v.displacement.length, t);
         v.position.x = min(width / 2, max(-width / 2, v.position.x));
         v.position.y = min(height / 2, max(-height / 2, v.position.y));
       }
@@ -111,20 +90,9 @@ class FruchtermanReingoldAlgorithm extends NodeLayoutAlgorithm {
   }
 
   MutableNodePosition _randomPosition(Size size) {
-    return MutableNodePosition(Vector2((r.nextDouble() - 0.5) * size.width / 2,
-        (r.nextDouble() - 0.5) * size.height / 2));
+    return MutableNodePosition(Vector2(
+        (r.nextDouble() - 0.5) * size.width / 2, (r.nextDouble() - 0.5) * size.height / 2));
   }
-
-  bool operator ==(dynamic other) {
-    return other is FruchtermanReingoldAlgorithm &&
-        iterations == other.iterations &&
-        repulsionMultiplierX == other.repulsionMultiplierX &&
-        repulsionMultiplierY == other.repulsionMultiplierY &&
-        other.attractionMultiplier == attractionMultiplier;
-  }
-
-  int get hashCode => hashValues(iterations, repulsionMultiplierX,
-      repulsionMultiplierY, attractionMultiplier);
 }
 
 class Edge<T> {
@@ -133,10 +101,8 @@ class Edge<T> {
   final T destination;
 
   bool operator ==(dynamic other) =>
-      other is Edge &&
-      other.source == source &&
-      other.destination == destination;
+      other is Edge && other.source == source && other.destination == destination;
 
   @override
-  int get hashCode => source.hashCode + destination.hashCode;
+  int get hashCode => source.hashCode ^ destination.hashCode;
 }

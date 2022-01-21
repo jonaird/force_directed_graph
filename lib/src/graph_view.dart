@@ -1,33 +1,29 @@
 part of '../force_directed_graph.dart';
 
 class GraphView<T> extends StatelessWidget {
-  GraphView(
-      {this.nodes,
-      this.edges,
-      this.nodeBuilder,
-      this.edgeBuilder,
-      this.size,
-      this.duration = const Duration(milliseconds: 400),
-      this.curve = Curves.easeInOutExpo,
-      this.controller,
-      this.algorithm = const FruchtermanReingoldAlgorithm(),
-      this.animated = true,
-      this.draggableNodes = true,
-      this.draggingPinsNodes = false})
-      : assert(nodes != null),
-        assert(edges != null),
-        assert(nodeBuilder != null),
-        assert(edgeBuilder != null);
+  GraphView({
+    required this.nodes,
+    required this.edges,
+    required this.nodeBuilder,
+    required this.edgeBuilder,
+    required this.size,
+    this.duration = const Duration(milliseconds: 400),
+    this.curve = Curves.easeInOutExpo,
+    this.controller,
+    this.algorithm = const FruchtermanReingoldAlgorithm(),
+    this.animated = true,
+    this.draggableNodes = true,
+    this.draggingPinsNodes = false,
+  });
   final List<T> nodes;
   final List<Edge<T>> edges;
   final Widget Function(T data, BuildContext context) nodeBuilder;
   final Size size;
   final Duration duration;
   final Curve curve;
-  final Widget Function(Edge<T> edge, double rotation, BuildContext context)
-      edgeBuilder;
-  final GraphController<T> controller;
-  final NodeLayoutAlgorithm algorithm;
+  final Widget Function(Edge<T> edge, double rotation, BuildContext context) edgeBuilder;
+  final GraphController<T>? controller;
+  final GraphLayoutAlgorithm algorithm;
   final bool animated, draggableNodes, draggingPinsNodes;
   @override
   Widget build(BuildContext context) {
@@ -40,7 +36,7 @@ class GraphView<T> extends StatelessWidget {
           size: size,
           curve: curve,
           duration: duration,
-          controller: controller,
+          controller: controller ?? GraphController<T>(),
           algorithm: algorithm,
           animated: animated,
           draggableNodes: draggableNodes,
@@ -51,29 +47,29 @@ class GraphView<T> extends StatelessWidget {
 }
 
 class _GraphState<T> {
-  _GraphState(
-      {this.nodes,
-      this.edges,
-      this.nodeBuilder,
-      this.edgeBuilder,
-      this.size,
-      this.duration,
-      this.curve,
-      this.controller,
-      this.algorithm,
-      this.animated,
-      this.draggableNodes,
-      this.draggingPinsNodes});
+  _GraphState({
+    required this.nodes,
+    required this.edges,
+    required this.nodeBuilder,
+    required this.edgeBuilder,
+    required this.size,
+    required this.duration,
+    required this.curve,
+    required this.controller,
+    required this.algorithm,
+    required this.animated,
+    required this.draggableNodes,
+    required this.draggingPinsNodes,
+  });
   final List<T> nodes;
   final List<Edge<T>> edges;
   final Widget Function(T data, BuildContext context) nodeBuilder;
-  final Widget Function(Edge<T> edge, double rotation, BuildContext context)
-      edgeBuilder;
+  final Widget Function(Edge<T> edge, double rotation, BuildContext context) edgeBuilder;
   final Size size;
   final Duration duration;
   final Curve curve;
   final GraphController<T> controller;
-  final NodeLayoutAlgorithm algorithm;
+  final GraphLayoutAlgorithm algorithm;
   final bool animated, draggableNodes, draggingPinsNodes;
 
   bool operator ==(other) {
@@ -93,7 +89,10 @@ class _GraphState<T> {
 }
 
 class _InheritedGraph<T> extends InheritedWidget {
-  _InheritedGraph({this.state, Widget child}) : super(child: child);
+  _InheritedGraph({
+    required this.state,
+    required Widget child,
+  }) : super(child: child);
   final _GraphState<T> state;
 
   @override

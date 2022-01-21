@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' hide Colors;
 import 'dart:math';
 import 'package:collection/collection.dart';
-import 'package:tuple/tuple.dart';
-import 'package:flutter/rendering.dart';
 import 'src/helper_classes.dart';
 
 part 'src/layout_algorithm.dart';

@@ -23,28 +23,26 @@ class GraphExample extends StatefulWidget {
 }
 
 class _GraphExampleState extends State<GraphExample> {
-  List<int> nodes;
-  List<Edge<int>> edges;
+  late List<int> nodes;
+  late List<Edge<int>> edges;
   final r = Random();
   double size = 400;
   final _controller = GraphController<int>();
 
   @override
   void initState() {
+    super.initState();
+    debugPrint('initState');
     nodes = [for (var i = 0; i < 10; i += 1) i];
 
-    edges = [
-      for (var i = 0; i < 20; i++)
-        Edge(nodes[r.nextInt(10)], nodes[r.nextInt(10)])
-    ];
+    edges = [for (var i = 0; i < 20; i++) Edge(nodes[r.nextInt(10)], nodes[r.nextInt(10)])];
     // nodes = [1, 2];
     // edges = [Edge(1, 2)];
-
+    final edgesToRemove = <Edge<int>>[];
     for (var edge in edges) {
-      if (edge.source == edge.destination) edges.remove(edge);
+      if (edge.source == edge.destination) edgesToRemove.add(edge);
     }
-
-    super.initState();
+    edgesToRemove.forEach(edges.remove);
   }
 
   @override
@@ -53,32 +51,29 @@ class _GraphExampleState extends State<GraphExample> {
       children: [
         Row(
           children: [
-            RaisedButton(
+            ElevatedButton(
               child: Text('decrease area size'),
               onPressed: () => setState(() => size -= 100),
             ),
-            RaisedButton(
+            ElevatedButton(
               child: Text('increase area size'),
               onPressed: () => setState(() => size += 100),
             ),
-            RaisedButton(
+            ElevatedButton(
               child: Text('add node'),
               onPressed: () => setState(() {
                 nodes.add(nodes.length);
-                edges.addAll(
-                    [Edge(nodes.length - 1, r.nextInt(nodes.length - 1))]);
+                edges.addAll([Edge(nodes.length - 1, r.nextInt(nodes.length - 1))]);
               }),
             ),
-            RaisedButton(
-                child: Text('reset'),
-                onPressed: () => _controller.resetGraph()),
+            ElevatedButton(child: Text('reset'), onPressed: () => _controller.resetGraph()),
           ],
         ),
         Container(
           color: Colors.black12,
           child: GraphView<int>(
             nodes: nodes,
-            edges: edges,
+            edges: List.from(edges),
             controller: _controller,
             duration: Duration(milliseconds: 300),
             curve: Curves.easeInOutQuad,

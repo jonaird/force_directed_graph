@@ -4,13 +4,12 @@ version: 0.0.5
 homepage: "https://github.com/jonaird/force_directed_graph"
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
-  flutter: ">=1.17.0 <2.0.0"
+  sdk: ">=2.15.0 <3.0.0"
+  flutter: ">=2.7.0 <3.0.0"
 
 dependencies:
   vector_math: 
   collection: 
-  tuple: ^1.0.3
   flutter:
     sdk: flutter
 

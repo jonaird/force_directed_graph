@@ -5,7 +5,7 @@ class NodeOffset extends Offset {
   NodeOffset(double dx, double dy, this.pinned) : super(dx, dy);
   final bool pinned;
 
-  NodeOffset copyWith({double dx, double dy, bool pinned}) =>
+  NodeOffset copyWith({double? dx, double? dy, bool? pinned}) =>
       NodeOffset(dx ?? this.dx, dy ?? this.dy, pinned ?? this.pinned);
 
   @override
@@ -17,8 +17,7 @@ class NodeLayout {
   final Size size;
   final Offset offset;
 
-  Offset get centerOffset =>
-      Offset(offset.dx + size.width / 2, offset.dy + size.height / 2);
+  Offset get centerOffset => Offset(offset.dx + size.width / 2, offset.dy + size.height / 2);
 }
 
 class NodePosition {
@@ -26,8 +25,7 @@ class NodePosition {
   final Vector2 position;
   final bool pinned;
 
-  MutableNodePosition toMutable() =>
-      MutableNodePosition(position, pinned: pinned);
+  MutableNodePosition toMutable() => MutableNodePosition(position, pinned: pinned);
 }
 
 class MutableNodePosition {
@@ -48,7 +46,7 @@ extension VectorExtensions on Offset {
     return Vector2(dx - size.width / 2, dy - size.height / 2);
   }
 
-  Offset copyWith({double x, double y}) {
+  Offset copyWith({double? x, double? y}) {
     return Offset(x ?? dx, y ?? dy);
   }
 
