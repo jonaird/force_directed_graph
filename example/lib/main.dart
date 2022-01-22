@@ -45,6 +45,13 @@ class _GraphExampleState extends State<GraphExample> {
     edgesToRemove.forEach(edges.remove);
   }
 
+  void _removeNode(int node) {
+    setState(() {
+      nodes.remove(node);
+      edges.removeWhere((e) => e.source == node || e.destination == node);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -65,6 +72,10 @@ class _GraphExampleState extends State<GraphExample> {
                 nodes.add(nodes.length);
                 edges.addAll([Edge(nodes.length - 1, r.nextInt(nodes.length - 1))]);
               }),
+            ),
+            ElevatedButton(
+              child: Text('remove node'),
+              onPressed: () => _removeNode(r.nextInt(nodes.length)),
             ),
             ElevatedButton(child: Text('reset'), onPressed: () => _controller.resetGraph()),
           ],

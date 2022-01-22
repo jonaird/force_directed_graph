@@ -1,7 +1,8 @@
 part of '../force_directed_graph.dart';
 
 class _GraphLayoutWidget<T> extends StatefulWidget {
-  // _GraphLayoutWidget(this.grap)
+  _GraphLayoutWidget({required this.graphState});
+  final _GraphState<T> graphState;
   @override
   ___GraphLayoutWidgetState<T> createState() => ___GraphLayoutWidgetState<T>();
 }
@@ -17,8 +18,19 @@ class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
   late bool _draggingPinsNode, _draggableNodes;
 
   @override
-  void didChangeDependencies() {
-    state = context.dependOnInheritedWidgetOfExactType<_InheritedGraph<T>>()!.state;
+  void initState() {
+    _update();
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant _GraphLayoutWidget<T> oldWidget) {
+    if (oldWidget.graphState != widget.graphState) _update();
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void _update() {
+    state = widget.graphState;
 
     _children = Map<T, Widget>.fromIterable(
       state.nodes,
@@ -38,7 +50,6 @@ class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
     _controller._determiningFinalLayout = true;
     _draggableNodes = state.draggableNodes;
     _draggingPinsNode = state.draggingPinsNodes;
-    super.didChangeDependencies();
   }
 
   void _setFinalLayouts(Map<T, NodeLayout> finalLayouts) {
@@ -137,7 +148,7 @@ class _GraphLayoutDelegate<T> extends MultiChildLayoutDelegate {
     //layout nodes
     for (var node in offsets.keys) {
       var childId = node;
-      var childSize = layoutChild(childId as Object, BoxConstraints.loose(Size.infinite));
+      var childSize = layoutChild(childId as Object, BoxConstraints.loose(size));
 
       var childOffset = offsets[node]!;
       //offset children such that the center of the child is at the calculated point

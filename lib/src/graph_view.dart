@@ -27,8 +27,8 @@ class GraphView<T> extends StatelessWidget {
   final bool animated, draggableNodes, draggingPinsNodes;
   @override
   Widget build(BuildContext context) {
-    return _InheritedGraph<T>(
-      state: _GraphState<T>(
+    return _GraphLayoutWidget<T>(
+      graphState: _GraphState<T>(
           nodes: List.from(nodes),
           edges: List.from(edges),
           nodeBuilder: nodeBuilder,
@@ -41,7 +41,6 @@ class GraphView<T> extends StatelessWidget {
           animated: animated,
           draggableNodes: draggableNodes,
           draggingPinsNodes: draggingPinsNodes),
-      child: _GraphLayoutWidget<T>(),
     );
   }
 }
