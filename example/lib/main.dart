@@ -23,8 +23,8 @@ class GraphExample extends StatefulWidget {
 }
 
 class _GraphExampleState extends State<GraphExample> {
-  late List<int> nodes;
-  late List<Edge<int>> edges;
+  final nodes = {for (var i = 0; i < 10; i += 1) i};
+  late final edges = {for (var i = 0; i < 20; i++) Edge(r.nextInt(10), r.nextInt(10))};
   final r = Random();
   double size = 400;
   final _controller = GraphController<int>();
@@ -32,12 +32,7 @@ class _GraphExampleState extends State<GraphExample> {
   @override
   void initState() {
     super.initState();
-    debugPrint('initState');
-    nodes = [for (var i = 0; i < 10; i += 1) i];
 
-    edges = [for (var i = 0; i < 20; i++) Edge(nodes[r.nextInt(10)], nodes[r.nextInt(10)])];
-    // nodes = [1, 2];
-    // edges = [Edge(1, 2)];
     final edgesToRemove = <Edge<int>>[];
     for (var edge in edges) {
       if (edge.source == edge.destination) edgesToRemove.add(edge);
@@ -45,10 +40,23 @@ class _GraphExampleState extends State<GraphExample> {
     edgesToRemove.forEach(edges.remove);
   }
 
-  void _removeNode(int node) {
+  void _removeNode() {
     setState(() {
+      final node = nodes.toList()[r.nextInt(nodes.length)];
       nodes.remove(node);
       edges.removeWhere((e) => e.source == node || e.destination == node);
+    });
+  }
+
+  void _addNode() {
+    final nodeList = nodes.toList();
+    final node = r.nextInt(100);
+    setState(() {
+      final existingNode = nodeList[r.nextInt(nodeList.length)];
+      final existingNode2 = nodeList[r.nextInt(nodeList.length)];
+      if (node != existingNode) edges.add(Edge(existingNode, node));
+      if (node != existingNode2) edges.add(Edge(existingNode2, node));
+      nodes.add(node);
     });
   }
 
@@ -68,14 +76,11 @@ class _GraphExampleState extends State<GraphExample> {
             ),
             ElevatedButton(
               child: Text('add node'),
-              onPressed: () => setState(() {
-                nodes.add(nodes.length);
-                edges.addAll([Edge(nodes.length - 1, r.nextInt(nodes.length - 1))]);
-              }),
+              onPressed: _addNode,
             ),
             ElevatedButton(
               child: Text('remove node'),
-              onPressed: () => _removeNode(r.nextInt(nodes.length)),
+              onPressed: _removeNode,
             ),
             ElevatedButton(child: Text('reset'), onPressed: () => _controller.resetGraph()),
           ],
@@ -84,7 +89,7 @@ class _GraphExampleState extends State<GraphExample> {
           color: Colors.black12,
           child: GraphView<int>(
             nodes: nodes,
-            edges: List.from(edges),
+            edges: edges,
             controller: _controller,
             duration: Duration(milliseconds: 300),
             curve: Curves.easeInOutQuad,

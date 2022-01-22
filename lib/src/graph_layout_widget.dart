@@ -1,65 +1,32 @@
 part of '../force_directed_graph.dart';
 
 class _GraphLayoutWidget<T> extends StatefulWidget {
-  _GraphLayoutWidget({required this.graphState});
-  final _GraphState<T> graphState;
+  _GraphLayoutWidget({required this.controller, required this.configuration});
+  final _GraphViewConfiguration<T> configuration;
+  final GraphController<T> controller;
   @override
   ___GraphLayoutWidgetState<T> createState() => ___GraphLayoutWidgetState<T>();
 }
 
 class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
     with SingleTickerProviderStateMixin {
-  late GraphController<T> _controller;
-  late AnimationController _animationController;
-  bool _firstPass = true;
-  late _GraphState<T> state;
-  late Map<T, Widget> _children;
-  late Map<T, Size> _nodeSizes;
-  late bool _draggingPinsNode, _draggableNodes;
+  GraphController<T> get _controller => widget.controller;
+  late AnimationController _animationController = AnimationController(vsync: this);
+  _GraphViewConfiguration<T> get configuration => widget.configuration;
 
   @override
   void initState() {
-    _update();
+    _controller._initialize(configuration, _animationController);
+    _controller.addListener(() => setState(() {}));
     super.initState();
   }
 
   @override
   void didUpdateWidget(covariant _GraphLayoutWidget<T> oldWidget) {
-    if (oldWidget.graphState != widget.graphState) _update();
+    if (oldWidget.configuration != widget.configuration) {
+      _controller._setNewConfiguration(configuration);
+    }
     super.didUpdateWidget(oldWidget);
-  }
-
-  void _update() {
-    state = widget.graphState;
-
-    _children = Map<T, Widget>.fromIterable(
-      state.nodes,
-      key: (element) => element,
-      value: (e) => Builder(builder: (builderContext) => state.nodeBuilder(e, builderContext)),
-    );
-    if (_firstPass) {
-      _controller = state.controller;
-      _animationController = AnimationController(vsync: this);
-      _controller._initialize(state.nodes, state.edges, state.size, _animationController,
-          state.animated, state.curve, state.duration, state.algorithm);
-      _controller.addListener(() => setState(() {}));
-      _firstPass = false;
-    } else
-      _controller._setNewConfiguration(state.nodes, state.edges, state.size, state.animated,
-          state.curve, state.duration, state.algorithm);
-    _controller._determiningFinalLayout = true;
-    _draggableNodes = state.draggableNodes;
-    _draggingPinsNode = state.draggingPinsNodes;
-  }
-
-  void _setFinalLayouts(Map<T, NodeLayout> finalLayouts) {
-    _controller._determiningFinalLayout = false;
-    _nodeSizes = finalLayouts.map((key, value) => MapEntry(key, value.size));
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      _controller._startTransition(finalLayouts
-          // finalLayouts.map((key, value) => MapEntry(key, value.offset)
-          );
-    });
   }
 
   @override
@@ -70,7 +37,7 @@ class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
   }
 
   void _onPanUpdate(T node, DragUpdateDetails details) {
-    if (_draggableNodes) {
+    if (configuration.draggableNodes) {
       var newOffset = _controller[node] += details.delta;
       var dx = newOffset.dx;
       var dy = newOffset.dy;
@@ -78,12 +45,12 @@ class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
       dx = max(dx, 0);
       dy = max(dy, 0);
 
-      dx = min(dx, _controller.size.width - _nodeSizes[node]!.width);
-      dy = min(dy, _controller.size.height - _nodeSizes[node]!.height);
+      dx = min(dx, _controller.currentSize.width - _controller._nodeSizes[node]!.width);
+      dy = min(dy, _controller.currentSize.height - _controller._nodeSizes[node]!.height);
 
       _controller[node] = Offset(dx, dy);
       // Offset(_controller.size.width, _controller.size.height);
-      if (_draggingPinsNode) _controller.pinNode(node);
+      if (configuration.draggingPinsNodes) _controller.pinNode(node);
     }
   }
 
@@ -91,26 +58,22 @@ class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
   Widget build(BuildContext context) {
     return Stack(children: [
       Container(
-          width: _controller.size.width,
-          height: _controller.size.height,
+          width: _controller.currentSize.width,
+          height: _controller.currentSize.height,
           child: Stack(
             children: [
-              if (!_firstPass)
-                for (var edge in _controller._edges)
-                  _EdgeWidget(
-                      edge,
-                      _nodeSizes[edge.source]!.toLayout(_controller[edge.source]),
-                      _nodeSizes[edge.destination]!.toLayout(_controller[edge.destination]),
-                      state.edgeBuilder,
-                      _controller.size),
-              if (!_firstPass)
-                for (var node in _controller._nodes.keys)
-                  Positioned(
-                      left: _controller[node].dx,
-                      top: _controller[node].dy,
-                      child: GestureDetector(
-                          onPanUpdate: (details) => _onPanUpdate(node, details),
-                          child: _children[node])),
+              _EdgesWidget(_controller),
+              for (var node in _controller._nodes.keys)
+                Positioned(
+                    left: _controller[node].dx,
+                    top: _controller[node].dy,
+                    child:
+                        // GestureDetector(
+                        //     onPanUpdate: (details) => _onPanUpdate(node, details),
+                        //     child:
+                        configuration.nodeBuilder(node, context)
+                    // )
+                    ),
             ],
           )),
       if (_controller._determiningFinalLayout)
@@ -118,16 +81,17 @@ class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
           top: 0,
           left: 0,
           child: Container(
-              width: _controller._scheduledTransitionSize.width,
-              height: _controller._scheduledTransitionSize.height,
+              width: configuration.size.width,
+              height: configuration.size.height,
               child: CustomMultiChildLayout(
                 children: [
-                  for (var node in _children.keys)
+                  for (var node in configuration.nodes)
                     LayoutId(
-                        id: node as Object, child: Opacity(opacity: 0, child: _children[node]))
+                        id: node as Object,
+                        child: Opacity(
+                            opacity: 0, child: configuration.nodeBuilder(node, context)))
                 ],
-                delegate: _GraphLayoutDelegate(
-                    _controller._scheduledTransitionOffsets, _setFinalLayouts),
+                delegate: _GraphLayoutDelegate(_controller),
               )),
         )
     ]);
@@ -135,11 +99,9 @@ class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
 }
 
 class _GraphLayoutDelegate<T> extends MultiChildLayoutDelegate {
-  _GraphLayoutDelegate(this.offsets, this.callback);
-  final void Function(Map<T, NodeLayout> layouts) callback;
-  final Map<T, Offset> offsets;
-
-  final sizes = <NodePosition, Size>{};
+  _GraphLayoutDelegate(this.controller);
+  final GraphController<T> controller;
+  Map<T, Offset> get offsets => controller._scheduledTransitionOffsets;
 
   final nodeLayouts = <T, NodeLayout>{};
 
@@ -147,9 +109,8 @@ class _GraphLayoutDelegate<T> extends MultiChildLayoutDelegate {
   void performLayout(Size size) {
     //layout nodes
     for (var node in offsets.keys) {
-      var childId = node;
-      var childSize = layoutChild(childId as Object, BoxConstraints.loose(size));
-
+      var childSize = layoutChild(node as Object, BoxConstraints.loose(size));
+      // controller._nodeSizes[node] = childSize;
       var childOffset = offsets[node]!;
       //offset children such that the center of the child is at the calculated point
       childOffset =
@@ -164,13 +125,15 @@ class _GraphLayoutDelegate<T> extends MultiChildLayoutDelegate {
         childOffset = childOffset.copyWith(y: size.height - childSize.height);
       nodeLayouts[node] = NodeLayout(childSize, childOffset);
 
-      positionChild(childId, childOffset);
+      positionChild(node, childOffset);
     }
-    callback(nodeLayouts);
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      controller._startTransition(nodeLayouts);
+    });
   }
 
   @override
   bool shouldRelayout(covariant MultiChildLayoutDelegate oldDelegate) {
-    return true;
+    return false;
   }
 }

@@ -12,3 +12,4 @@ part 'src/controller.dart';
 part 'src/edges.dart';
 part 'src/graph_layout_widget.dart';
 part 'src/graph_view.dart';
+part 'src/edges_widget.dart';

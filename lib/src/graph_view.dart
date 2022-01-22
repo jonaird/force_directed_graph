@@ -14,9 +14,11 @@ class GraphView<T> extends StatelessWidget {
     this.animated = true,
     this.draggableNodes = true,
     this.draggingPinsNodes = false,
-  });
-  final List<T> nodes;
-  final List<Edge<T>> edges;
+  }) {
+    assert(_nodesContainsAllEdgeNodes(nodes, edges));
+  }
+  final Set<T> nodes;
+  final Set<Edge<T>> edges;
   final Widget Function(T data, BuildContext context) nodeBuilder;
   final Size size;
   final Duration duration;
@@ -28,25 +30,34 @@ class GraphView<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _GraphLayoutWidget<T>(
-      graphState: _GraphState<T>(
-          nodes: List.from(nodes),
-          edges: List.from(edges),
+      controller: controller ?? GraphController<T>(),
+      configuration: _GraphViewConfiguration<T>(
+          nodes: Set.from(nodes),
+          edges: Set.from(edges),
           nodeBuilder: nodeBuilder,
           edgeBuilder: edgeBuilder,
           size: size,
           curve: curve,
           duration: duration,
-          controller: controller ?? GraphController<T>(),
           algorithm: algorithm,
           animated: animated,
           draggableNodes: draggableNodes,
           draggingPinsNodes: draggingPinsNodes),
     );
   }
+
+  bool _nodesContainsAllEdgeNodes(Set<T> nodes, Set<Edge<T>> edges) {
+    for (final edge in edges) {
+      if (!nodes.contains(edge.source) || !nodes.contains(edge.destination)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
-class _GraphState<T> {
-  _GraphState({
+class _GraphViewConfiguration<T> {
+  _GraphViewConfiguration({
     required this.nodes,
     required this.edges,
     required this.nodeBuilder,
@@ -54,37 +65,41 @@ class _GraphState<T> {
     required this.size,
     required this.duration,
     required this.curve,
-    required this.controller,
     required this.algorithm,
     required this.animated,
     required this.draggableNodes,
     required this.draggingPinsNodes,
   });
-  final List<T> nodes;
-  final List<Edge<T>> edges;
+  final Set<T> nodes;
+  final Set<Edge<T>> edges;
   final Widget Function(T data, BuildContext context) nodeBuilder;
   final Widget Function(Edge<T> edge, double rotation, BuildContext context) edgeBuilder;
   final Size size;
   final Duration duration;
   final Curve curve;
-  final GraphController<T> controller;
   final GraphLayoutAlgorithm algorithm;
   final bool animated, draggableNodes, draggingPinsNodes;
 
   bool operator ==(other) {
     var eq = DeepCollectionEquality.unordered();
-    return other is _GraphState<T> &&
+    return other is _GraphViewConfiguration<T> &&
         eq.equals(other.nodes, nodes) &&
         eq.equals(other.edges, edges) &&
         size == other.size &&
-        algorithm == other.algorithm;
+        algorithm == other.algorithm &&
+        animated == other.animated &&
+        draggableNodes == other.draggableNodes &&
+        draggingPinsNodes == other.draggingPinsNodes;
   }
 
   int get hashCode =>
-      nodes.map((e) => e.hashCode).reduce((value, element) => value + element) +
-      edges.map((e) => e.hashCode).reduce((value, element) => value + element) +
-      size.hashCode +
-      algorithm.hashCode;
+      hashList(nodes) ^
+      hashList(edges) ^
+      size.hashCode ^
+      algorithm.hashCode ^
+      animated.hashCode ^
+      draggableNodes.hashCode ^
+      draggingPinsNodes.hashCode;
 }
 
 class _InheritedGraph<T> extends InheritedWidget {
@@ -92,7 +107,7 @@ class _InheritedGraph<T> extends InheritedWidget {
     required this.state,
     required Widget child,
   }) : super(child: child);
-  final _GraphState<T> state;
+  final _GraphViewConfiguration<T> state;
 
   @override
   bool updateShouldNotify(covariant _InheritedGraph oldWidget) {

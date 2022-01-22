@@ -1,7 +1,7 @@
 part of '../force_directed_graph.dart';
 
 abstract class GraphLayoutAlgorithm {
-  Map<T, Offset> runAlgorithm<T>(Map<T, NodeOffset?> nodes, List<Edge<T>> edges, Size size);
+  Map<T, Offset> runAlgorithm<T>(Map<T, NodeOffset?> nodes, Set<Edge<T>> edges, Size size);
 }
 
 var r = Random();
@@ -19,7 +19,7 @@ class FruchtermanReingoldAlgorithm implements GraphLayoutAlgorithm {
   }
 
   @override
-  Map<T, Offset> runAlgorithm<T>(Map<T, NodeOffset?> nodes, List<Edge<T>> edges, Size size) {
+  Map<T, Offset> runAlgorithm<T>(Map<T, NodeOffset?> nodes, Set<Edge<T>> edges, Size size) {
     var temp = 0.1 * sqrt(size.width / 2 * size.height / 2);
 
     //initialize nodes with random positions and convert to MutableNodePosition
@@ -36,7 +36,7 @@ class FruchtermanReingoldAlgorithm implements GraphLayoutAlgorithm {
   }
 
   void _calculateIteration<T>(
-      Map<T, MutableNodePosition> nodes, List<Edge<T>> edges, Size size, double t) {
+      Map<T, MutableNodePosition> nodes, Set<Edge<T>> edges, Size size, double t) {
     var width = size.width;
     var height = size.height;
     final result = nodes;
