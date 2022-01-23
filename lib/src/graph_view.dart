@@ -7,6 +7,7 @@ class GraphView<T> extends StatelessWidget {
     required this.nodeBuilder,
     required this.edgeBuilder,
     required this.size,
+    this.padding = const EdgeInsets.all(10),
     this.duration = const Duration(milliseconds: 400),
     this.curve = Curves.easeInOutExpo,
     this.controller,
@@ -21,6 +22,7 @@ class GraphView<T> extends StatelessWidget {
   final Set<Edge<T>> edges;
   final Widget Function(T data, BuildContext context) nodeBuilder;
   final Size size;
+  final EdgeInsets padding;
   final Duration duration;
   final Curve curve;
   final Widget Function(Edge<T> edge, double rotation, BuildContext context) edgeBuilder;
@@ -37,6 +39,7 @@ class GraphView<T> extends StatelessWidget {
           nodeBuilder: nodeBuilder,
           edgeBuilder: edgeBuilder,
           size: size,
+          padding: padding,
           curve: curve,
           duration: duration,
           algorithm: algorithm,
@@ -63,6 +66,7 @@ class _GraphViewConfiguration<T> {
     required this.nodeBuilder,
     required this.edgeBuilder,
     required this.size,
+    required this.padding,
     required this.duration,
     required this.curve,
     required this.algorithm,
@@ -75,6 +79,7 @@ class _GraphViewConfiguration<T> {
   final Widget Function(T data, BuildContext context) nodeBuilder;
   final Widget Function(Edge<T> edge, double rotation, BuildContext context) edgeBuilder;
   final Size size;
+  final EdgeInsets padding;
   final Duration duration;
   final Curve curve;
   final GraphLayoutAlgorithm algorithm;

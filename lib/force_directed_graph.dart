@@ -13,3 +13,4 @@ part 'src/edges.dart';
 part 'src/graph_layout_widget.dart';
 part 'src/graph_view.dart';
 part 'src/edges_widget.dart';
+part 'src/nodes_widget.dart';

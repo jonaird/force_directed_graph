@@ -101,6 +101,7 @@ class _GraphExampleState extends State<GraphExample> {
               ),
             ),
             size: Size(size, size),
+            padding: EdgeInsets.all(20),
           ),
         ),
       ],

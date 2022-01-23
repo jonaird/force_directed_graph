@@ -28,20 +28,24 @@ class _EdgesWidgetState<T> extends State<_EdgesWidget<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        for (var edge in _controller._configuration.edges)
-          if (_controller._nodeSizes[edge.source] != null &&
-              _controller._nodeSizes[edge.destination] != null)
-            _EdgeWidget(
-              edge,
-              _controller._nodeSizes[edge.source]!.toLayout(_controller[edge.source]),
-              _controller._nodeSizes[edge.destination]!
-                  .toLayout(_controller[edge.destination]),
-              _controller._configuration.edgeBuilder,
-              _controller.currentSize,
-            )
-      ],
+    return Padding(
+      padding: _controller._configuration.padding,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          for (var edge in _controller._configuration.edges)
+            if (_controller._nodeSizes[edge.source] != null &&
+                _controller._nodeSizes[edge.destination] != null)
+              _EdgeWidget(
+                edge,
+                _controller._nodeSizes[edge.source]!.toLayout(_controller[edge.source]),
+                _controller._nodeSizes[edge.destination]!
+                    .toLayout(_controller[edge.destination]),
+                _controller._configuration.edgeBuilder,
+                _controller.currentSize,
+              )
+        ],
+      ),
     );
   }
 }
