@@ -87,9 +87,7 @@ class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
                 children: [
                   for (var node in configuration.nodes)
                     LayoutId(
-                        id: node as Object,
-                        child: Opacity(
-                            opacity: 0, child: configuration.nodeBuilder(node, context)))
+                        id: node as Object, child: configuration.nodeBuilder(node, context))
                 ],
                 delegate: _GraphLayoutDelegate(_controller),
               )),
@@ -101,28 +99,23 @@ class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
 class _GraphLayoutDelegate<T> extends MultiChildLayoutDelegate {
   _GraphLayoutDelegate(this.controller);
   final GraphController<T> controller;
-  Map<T, Offset> get offsets => controller._scheduledTransitionOffsets;
+  Map<T, Offset> get initialOffsets => controller._scheduledTransitionOffsets;
 
   final nodeLayouts = <T, NodeLayout>{};
 
   @override
   void performLayout(Size size) {
     //layout nodes
-    for (var node in offsets.keys) {
+    for (var node in initialOffsets.keys) {
       var childSize = layoutChild(node as Object, BoxConstraints.loose(size));
       // controller._nodeSizes[node] = childSize;
-      var childOffset = offsets[node]!;
+      var childOffset = initialOffsets[node]!;
       //offset children such that the center of the child is at the calculated point
       childOffset =
           Offset(childOffset.dx - childSize.width / 2, childOffset.dy - childSize.height / 2);
 
       //make sure that children are not cut off at the edges
-      if (childOffset.dx < 0) childOffset = childOffset.copyWith(x: 0);
-      if (childOffset.dx > size.width - childSize.width)
-        childOffset = childOffset.copyWith(x: size.width - childSize.width);
-      if (childOffset.dy < 0) childOffset = childOffset.copyWith(y: 0);
-      if (childOffset.dy > size.height - childSize.height)
-        childOffset = childOffset.copyWith(y: size.height - childSize.height);
+      childOffset = _childOffsetWithinConstraints(childOffset, childSize, size);
       nodeLayouts[node] = NodeLayout(childSize, childOffset);
 
       positionChild(node, childOffset);
@@ -130,6 +123,17 @@ class _GraphLayoutDelegate<T> extends MultiChildLayoutDelegate {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       controller._startTransition(nodeLayouts);
     });
+  }
+
+  Offset _childOffsetWithinConstraints(Offset offset, Size childSize, Size size) {
+    var childOffset = offset;
+    if (childOffset.dx < 0) childOffset = childOffset.copyWith(x: 0);
+    if (childOffset.dx > size.width - childSize.width)
+      childOffset = childOffset.copyWith(x: size.width - childSize.width);
+    if (childOffset.dy < 0) childOffset = childOffset.copyWith(y: 0);
+    if (childOffset.dy > size.height - childSize.height)
+      childOffset = childOffset.copyWith(y: size.height - childSize.height);
+    return childOffset;
   }
 
   @override
