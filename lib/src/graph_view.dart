@@ -6,7 +6,8 @@ class GraphView<T> extends StatelessWidget {
     required this.edges,
     required this.nodeBuilder,
     required this.edgeBuilder,
-    required this.size,
+    required this.width,
+    required this.height,
     this.padding = const EdgeInsets.all(10),
     this.duration = const Duration(milliseconds: 400),
     this.curve = Curves.easeInOutExpo,
@@ -21,7 +22,7 @@ class GraphView<T> extends StatelessWidget {
   final Set<T> nodes;
   final Set<Edge<T>> edges;
   final Widget Function(T data, BuildContext context) nodeBuilder;
-  final Size size;
+  final double width, height;
   final EdgeInsets padding;
   final Duration duration;
   final Curve curve;
@@ -38,7 +39,7 @@ class GraphView<T> extends StatelessWidget {
           edges: Set.from(edges),
           nodeBuilder: nodeBuilder,
           edgeBuilder: edgeBuilder,
-          size: size,
+          size: Size(width - padding.horizontal, height - padding.vertical),
           padding: padding,
           curve: curve,
           duration: duration,

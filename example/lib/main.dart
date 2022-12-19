@@ -94,13 +94,17 @@ class _GraphExampleState extends State<GraphExample> {
             duration: Duration(milliseconds: 300),
             curve: Curves.easeInOutQuad,
             edgeBuilder: (edge, rotation, context) => LineEdge(),
-            nodeBuilder: (data, context) => Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(data.toString()),
+            nodeBuilder: (node, context) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(node.toString()),
+                ),
               ),
             ),
-            size: Size(size, size),
+            width: size,
+            height: size,
             padding: EdgeInsets.all(20),
           ),
         ),

@@ -73,7 +73,7 @@ packages:
       path: "/Users/jonathanaird/Developer/Libraries/force_directed_graph"
       relative: false
     source: path
-    version: "0.0.5"
+    version: "0.1.0"
   matcher:
     dependency: transitive
     description:

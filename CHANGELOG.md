@@ -1,3 +1,5 @@
+## [0.1.0] - Added padding value to options
+
 ## [0.0.4] - added license
 
 
