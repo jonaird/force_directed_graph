@@ -30,7 +30,8 @@ class GraphController<T> extends ChangeNotifier {
         key: (node) => node, value: (node) => null);
     var offsets = configuration.algorithm
         .runAlgorithm<T>(nodeOffsets, configuration.edges, configuration.size);
-    _nodeOffsets.addAll(offsets.map((n, v) => MapEntry(n, v.toNodeOffset(false))));
+    _nodeOffsets
+        .addAll(offsets.map((n, v) => MapEntry(n, v.toNodeOffset(false))));
   }
 
   void _setNewConfiguration(_GraphViewConfiguration<T> configuration) {
@@ -52,8 +53,8 @@ class GraphController<T> extends ChangeNotifier {
       newNodeOffsets[node] = oldOffset;
     }
 
-    final offsets = configuration.algorithm
-        .runAlgorithm<T>(newNodeOffsets, configuration.edges, configuration.size);
+    final offsets = configuration.algorithm.runAlgorithm<T>(
+        newNodeOffsets, configuration.edges, configuration.size);
     for (var node in newNodes) {
       _nodeOffsets[node] = offsets[node]!.toNodeOffset(false);
     }
@@ -62,7 +63,7 @@ class GraphController<T> extends ChangeNotifier {
 
   void _afterInitialLayout() {
     _initialLayout = false;
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
     });
   }
@@ -73,14 +74,19 @@ class GraphController<T> extends ChangeNotifier {
     if (_animationController.isAnimating) _animationController.stop();
     //if a size transition is interrupted, will finish animating to final size,
     //otherwise will not animate as size and _sheduledTransitionSize are the same.
-    _sizeAnimation = Tween<Size>(begin: currentSize, end: _configuration.size).animate(
-      CurvedAnimation(curve: _configuration.curve, parent: _animationController),
+    _sizeAnimation =
+        Tween<Size>(begin: currentSize, end: _configuration.size).animate(
+      CurvedAnimation(
+          curve: _configuration.curve, parent: _animationController),
     );
     _animations.clear();
     for (var node in _nodeOffsets.keys) {
-      var endOffset = nodeOffsets[node] != null ? nodeOffsets[node] : _nodeOffsets[node];
-      _animations[node] = Tween<Offset>(begin: _nodeOffsets[node], end: endOffset)
-          .animate(CurvedAnimation(curve: _configuration.curve, parent: _animationController));
+      var endOffset =
+          nodeOffsets[node] != null ? nodeOffsets[node] : _nodeOffsets[node];
+      _animations[node] =
+          Tween<Offset>(begin: _nodeOffsets[node], end: endOffset).animate(
+              CurvedAnimation(
+                  curve: _configuration.curve, parent: _animationController));
     }
     _animationController.value = 0;
     _animationController.forward();
@@ -114,16 +120,18 @@ class GraphController<T> extends ChangeNotifier {
   void operator []=(T node, Offset offset) {
     assert(_nodeOffsets.containsKey(node));
     var size = _nodeSizes[node]!;
-    var adjustedOffset = Offset(offset.dx + size.width / 2, offset.dy + size.height / 2);
-    _nodeOffsets[node] =
-        _nodeOffsets[node]!.copyWith(dx: adjustedOffset.dx, dy: adjustedOffset.dy);
+    var adjustedOffset =
+        Offset(offset.dx + size.width / 2, offset.dy + size.height / 2);
+    _nodeOffsets[node] = _nodeOffsets[node]!
+        .copyWith(dx: adjustedOffset.dx, dy: adjustedOffset.dy);
     notifyListeners();
   }
 
   NodeOffset operator [](T node) {
     var size = _nodeSizes[node]!;
     var offset = _nodeOffsets[node]!;
-    return offset.copyWith(dx: offset.dx - size.width / 2, dy: offset.dy - size.height / 2);
+    return offset.copyWith(
+        dx: offset.dx - size.width / 2, dy: offset.dy - size.height / 2);
   }
 
   ///unpins All nodes and recalculates positions

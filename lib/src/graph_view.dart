@@ -26,7 +26,8 @@ class GraphView<T> extends StatelessWidget {
   final EdgeInsets padding;
   final Duration duration;
   final Curve curve;
-  final Widget Function(Edge<T> edge, double rotation, BuildContext context) edgeBuilder;
+  final Widget Function(Edge<T> edge, double rotation, BuildContext context)
+      edgeBuilder;
   final GraphController<T>? controller;
   final GraphLayoutAlgorithm algorithm;
   final bool animated, draggableNodes, draggingPinsNodes;
@@ -78,7 +79,8 @@ class _GraphViewConfiguration<T> {
   final Set<T> nodes;
   final Set<Edge<T>> edges;
   final Widget Function(T data, BuildContext context) nodeBuilder;
-  final Widget Function(Edge<T> edge, double rotation, BuildContext context) edgeBuilder;
+  final Widget Function(Edge<T> edge, double rotation, BuildContext context)
+      edgeBuilder;
   final Size size;
   final EdgeInsets padding;
   final Duration duration;
