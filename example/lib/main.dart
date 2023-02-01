@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:force_directed_graph/force_directed_graph.dart';
 import 'dart:math';
+import 'counter_example.dart';
 
 void main() {
-  runApp(Example());
+  runApp(CounterExample());
 }
 
 class Example extends StatelessWidget {
@@ -24,7 +25,9 @@ class GraphExample extends StatefulWidget {
 
 class _GraphExampleState extends State<GraphExample> {
   final nodes = {for (var i = 0; i < 10; i += 1) i};
-  late final edges = {for (var i = 0; i < 20; i++) Edge(r.nextInt(10), r.nextInt(10))};
+  late final edges = {
+    for (var i = 0; i < 20; i++) Edge(r.nextInt(10), r.nextInt(10))
+  };
   final r = Random();
   double size = 400;
   final _controller = GraphController<int>();
@@ -82,7 +85,9 @@ class _GraphExampleState extends State<GraphExample> {
               child: Text('remove node'),
               onPressed: _removeNode,
             ),
-            ElevatedButton(child: Text('reset'), onPressed: () => _controller.resetGraph()),
+            ElevatedButton(
+                child: Text('reset'),
+                onPressed: () => _controller.resetGraph()),
           ],
         ),
         Container(
