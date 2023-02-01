@@ -1,6 +1,6 @@
 name: force_directed_graph
-description: A package for creating force directed graphs.
-version: 0.1.0
+description: A package for displaying force directed graphs.
+version: 0.1.1
 homepage: "https://github.com/jonaird/force_directed_graph"
 
 environment:
