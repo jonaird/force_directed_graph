@@ -34,7 +34,7 @@ class GraphView<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _GraphLayoutWidget<T>(
-      controller: controller ?? GraphController<T>(),
+      controller: controller,
       configuration: _GraphViewConfiguration<T>(
           nodes: Set.from(nodes),
           edges: Set.from(edges),

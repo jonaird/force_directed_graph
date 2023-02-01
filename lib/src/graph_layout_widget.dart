@@ -3,15 +3,17 @@ part of '../force_directed_graph.dart';
 class _GraphLayoutWidget<T> extends StatefulWidget {
   _GraphLayoutWidget({required this.controller, required this.configuration});
   final _GraphViewConfiguration<T> configuration;
-  final GraphController<T> controller;
+  final GraphController<T>? controller;
   @override
   ___GraphLayoutWidgetState<T> createState() => ___GraphLayoutWidgetState<T>();
 }
 
 class ___GraphLayoutWidgetState<T> extends State<_GraphLayoutWidget<T>>
     with SingleTickerProviderStateMixin {
-  GraphController<T> get _controller => widget.controller;
-  late AnimationController _animationController = AnimationController(vsync: this);
+  late GraphController<T> _controller =
+      widget.controller ?? GraphController<T>();
+  late AnimationController _animationController =
+      AnimationController(vsync: this);
   _GraphViewConfiguration<T> get configuration => widget.configuration;
 
   @override
