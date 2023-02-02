@@ -31685,7 +31685,7 @@ r=this.f
 if(!r.B(0,s))r.C(0,s)},
 K(a){var s,r,q=null
 this.a.toString
-s=A.a72("Flutter Demo Home Page",q)
+s=A.a72("Force Directed Graph Example",q)
 r=t.D
 return new A.qK(new A.nS(s,new A.Fv(q,q,1/0,56),q),A.mn(B.aV,A.a([A.JG(A.ac0(A.a([B.FW,A.a72(""+this.d,A.bd(a).p3.e)],r),B.zV),q,q),new A.ye(new A.Kv(this),q)],r),B.W,B.bl),q)}}
 A.Ks.prototype={
