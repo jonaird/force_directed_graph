@@ -13,7 +13,7 @@ class CounterExample extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const Demo(title: 'Flutter Demo Home Page'),
+      home: const Demo(title: 'Force Directed Graph Example'),
     );
   }
 }
