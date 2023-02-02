@@ -70,9 +70,10 @@ packages:
   force_directed_graph:
     dependency: "direct main"
     description:
-      path: "/Users/jonathanaird/Developer/Libraries/force_directed_graph"
-      relative: false
-    source: path
+      name: force_directed_graph
+      sha256: "48845ec9d05f902327c6de220f6ca5b8379815df6f7c1244a8d155248db0f358"
+      url: "https://pub.dev"
+    source: hosted
     version: "0.1.1"
   js:
     dependency: transitive

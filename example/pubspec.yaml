@@ -22,7 +22,6 @@ environment:
   flutter: ">=2.17.0 <4.0.0"
 dependencies:
   force_directed_graph:
-    path: "/Users/jonathanaird/Developer/Libraries/force_directed_graph"
   flutter:
     sdk: flutter
 
